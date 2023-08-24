@@ -107,25 +107,58 @@ class SiteController extends Controller
 
 
    public function actionView($id){
-   $post = Posts::findOne($id);
-        return $this->render('view',['post'=>$post]);    
+   $student = Student::findOne($id);
+           $course = Course::find()->all(); 
+        $subject = Subject::find()->all(); // Make
+
+         return $this->render('view',['student' => $student  ,'course' => $course ,'subject' => $subject // Pass the courses to the view
+]);
+
    }
 
-   public function actionUpdate($id){
-   $post = Posts::findOne($id);
-   if($post->load(Yii::$app->request->post()) && $post->save() ){
-    Yii::$app->getSession()->setFlash('message','Post Updated Successfully');
-    return $this->redirect(['index','id'=> $post->id]);
-   }
-   else{
-    return $this->render('update',['post'=>$post]);
-   }
-        return $this->render('update',['post'=>$post]);    
-       }
+
+public function actionUpdate($id){
+   $student = Student::findOne($id);
+        $course = Course::find()->all(); 
+        $subject = Subject::find()->all(); // Make sure to adjust the namespace for your Course model
+
+        // Make sure to adjust the namespace for your Course model
+
+        $formData = Yii::$app->request->post();
+        if($student->load($formData)){
+ 
+   // Convert the array of selected subject IDs to a string before saving
+
+      // Convert the array of selected course IDs to a string before saving
+
+
+
+   $selectedSubjectIds = Yii::$app->request->post('Student')['subject'];
+        $student->subject = implode(',', $selectedSubjectIds);
+
+
+
+            if($student->save()){
+                    Yii::$app->getSession()->setFlash('message','Student Updated Successfully');
+    return $this->redirect(['index','id'=> $student->id]);
+
+            }
+            else{
+         return $this->render('update',['student' => $student  ,'course' => $course ,'subject' => $subject // Pass the courses to the view
+]);
+                                
+                                }
+        } 
+         return $this->render('update',['student' => $student  ,'course' => $course ,'subject' => $subject // Pass the courses to the view
+]);
+    }
+
+
+
 
    public function actionDelete($id){
-   $post = Posts::findOne($id)->delete();
-   if($post){
+   $student = Student::findOne($id)->delete();
+   if($student){
     Yii::$app->getSession()->setFlash('message','Post Delete Successfully');
     return $this->redirect(['index']);
    }
@@ -167,6 +200,7 @@ class SiteController extends Controller
      *
      * @return Response|string
      */
+
     public function actionLogin()
     {
         if (!Yii::$app->user->isGuest) {
@@ -205,7 +239,7 @@ class SiteController extends Controller
     {
         $model = new ContactForm();
         if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
+           Yii::$app->session->setFlash('contactFormSubmitted');
 
             return $this->refresh();
         }
